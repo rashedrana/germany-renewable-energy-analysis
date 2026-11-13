@@ -56,11 +56,14 @@ by hand.
 data/analysis_subset.csv   Germany, France, Poland, Denmark, 2000-2024 (extract)
 src/download_data.py       downloads the two full OWID source datasets
 src/analysis.py            all headline statistics -> outputs/results.json
+src/analysis_extended.py   multivariate OLS, sub-period trends -> outputs/extended_results.json
 src/build_db.py            builds energy.db (SQLite) and runs the SQL queries
-src/figures.py             the six figures -> outputs/figures/
+src/figures.py             figures 1-6 -> outputs/figures/
+src/figures_extra.py       figures 7-8 (crossover, carbon intensity) for the full paper
 sql/queries.sql            9 documented SQL queries (shares, milestones, shocks)
 outputs/sql_results.md     the queries with their actual output tables
-paper/paper_draft.md       scientific paper draft based on these results
+paper/paper_full.md        full journal-style manuscript (8 figures, 3 tables)
+paper/paper_draft.md       earlier short draft (superseded by paper_full.md)
 ```
 
 ## How to run
