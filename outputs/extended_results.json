@@ -1,0 +1,137 @@
+{
+  "multivariate_ols": {
+    "n": 25,
+    "r_squared": 0.9992,
+    "adj_r_squared": 0.999,
+    "f_statistic": 6119.96,
+    "f_pvalue": 1.4445691962603728e-30,
+    "coefficients": {
+      "const": {
+        "coef": -81.842,
+        "std_err": 22.487,
+        "t": -3.64,
+        "p": 0.0016314152041046115
+      },
+      "renewables_share_elec": {
+        "coef": 0.908,
+        "std_err": 0.133,
+        "t": 6.82,
+        "p": 1.2487937343194118e-06
+      },
+      "coal_share_elec": {
+        "coef": 10.565,
+        "std_err": 0.342,
+        "t": 30.92,
+        "p": 2.318407448400581e-18
+      },
+      "gas_share_elec": {
+        "coef": 6.045,
+        "std_err": 0.589,
+        "t": 10.26,
+        "p": 2.06393150253573e-09
+      },
+      "electricity_demand": {
+        "coef": 0.082,
+        "std_err": 0.034,
+        "t": 2.41,
+        "p": 0.025908962815969182
+      }
+    }
+  },
+  "simple_ols": {
+    "slope": -4.556,
+    "slope_std_err": 0.3,
+    "slope_t": -15.18,
+    "slope_p": 1.7771694783744166e-13,
+    "intercept": 607.76,
+    "r_squared": 0.9093
+  },
+  "subperiods": {
+    "2000-2010": {
+      "share_start": 6.22,
+      "share_end": 16.89,
+      "change_points": 10.66,
+      "trend_per_year": 1.175
+    },
+    "2011-2019": {
+      "share_start": 20.57,
+      "share_end": 40.19,
+      "change_points": 19.62,
+      "trend_per_year": 2.281
+    },
+    "2020-2024": {
+      "share_start": 44.37,
+      "share_end": 58.64,
+      "change_points": 14.27,
+      "trend_per_year": 4.305
+    }
+  },
+  "correlation_matrix": {
+    "renewables_share_elec": {
+      "renewables_share_elec": 1.0,
+      "coal_share_elec": -0.954,
+      "nuclear_share_elec": -0.978,
+      "gas_share_elec": 0.713,
+      "carbon_intensity_elec": -0.954,
+      "co2_per_capita": -0.974,
+      "electricity_demand": -0.808
+    },
+    "coal_share_elec": {
+      "renewables_share_elec": -0.954,
+      "coal_share_elec": 1.0,
+      "nuclear_share_elec": 0.884,
+      "gas_share_elec": -0.851,
+      "carbon_intensity_elec": 0.996,
+      "co2_per_capita": 0.975,
+      "electricity_demand": 0.795
+    },
+    "nuclear_share_elec": {
+      "renewables_share_elec": -0.978,
+      "coal_share_elec": 0.884,
+      "nuclear_share_elec": 1.0,
+      "gas_share_elec": -0.653,
+      "carbon_intensity_elec": 0.874,
+      "co2_per_capita": 0.925,
+      "electricity_demand": 0.734
+    },
+    "gas_share_elec": {
+      "renewables_share_elec": 0.713,
+      "coal_share_elec": -0.851,
+      "nuclear_share_elec": -0.653,
+      "gas_share_elec": 1.0,
+      "carbon_intensity_elec": -0.809,
+      "co2_per_capita": -0.773,
+      "electricity_demand": -0.501
+    },
+    "carbon_intensity_elec": {
+      "renewables_share_elec": -0.954,
+      "coal_share_elec": 0.996,
+      "nuclear_share_elec": 0.874,
+      "gas_share_elec": -0.809,
+      "carbon_intensity_elec": 1.0,
+      "co2_per_capita": 0.975,
+      "electricity_demand": 0.826
+    },
+    "co2_per_capita": {
+      "renewables_share_elec": -0.974,
+      "coal_share_elec": 0.975,
+      "nuclear_share_elec": 0.925,
+      "gas_share_elec": -0.773,
+      "carbon_intensity_elec": 0.975,
+      "co2_per_capita": 1.0,
+      "electricity_demand": 0.869
+    },
+    "electricity_demand": {
+      "renewables_share_elec": -0.808,
+      "coal_share_elec": 0.795,
+      "nuclear_share_elec": 0.734,
+      "gas_share_elec": -0.501,
+      "carbon_intensity_elec": 0.826,
+      "co2_per_capita": 0.869,
+      "electricity_demand": 1.0
+    }
+  },
+  "demand_trend_per_year_twh": -2.59,
+  "demand_peak_year": 2007,
+  "demand_peak_twh": 614.5
+}
