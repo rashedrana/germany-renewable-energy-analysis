@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Germany Energy Transition Dashboard — Energiewende 2000–2024</title>
+<meta name="description" content="Interactive dashboard on Germany's electricity transition 2000–2024, with France, Poland and Denmark comparison. Real data: Our World in Data. Companion to the research paper by Rashed Rana.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f7f6fa; --card:#ffffff; --ink:#1e1b26; --muted:#6d6879; --border:#e4e0ee;
+  --accent:#7c3aed; --accent2:#0078d4; --good:#059669; --bad:#dc2626;
+  --shadow:0 6px 22px rgba(30,20,60,.08); --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 46px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+h1{font-size:25px;line-height:1.2}
+h1 .thin{color:var(--accent)}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.links{display:flex;gap:8px}
+.links a{font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--card);padding:7px 12px;border-radius:999px;color:var(--ink)}
+.links a:hover{border-color:var(--accent);color:var(--accent)}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.panel h3{font-size:13px;letter-spacing:1.1px;color:var(--muted);margin-bottom:10px;text-transform:uppercase}
+.controls{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
+.btnrow{display:flex;gap:7px;flex-wrap:wrap}
+.cbtn{border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600}
+.cbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cbtn.tgl.on{background:var(--accent2);border-color:var(--accent2)}
+input[type=range]{width:100%;accent-color:var(--accent);margin-top:8px}
+.yearbig{font-size:30px;font-weight:800;color:var(--accent);line-height:1}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.kpi .v{font-size:23px;font-weight:800}
+.kpi .u{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+.kpi .d{font-size:11.5px;font-weight:700;margin-top:6px}
+.d.up{color:var(--good)} .d.dn{color:var(--bad)} .d.flat{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+.grid2b{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chartbox{position:relative;height:300px}
+.chartbox.sm{height:262px}
+footer{color:var(--muted);font-size:12px;line-height:1.7;margin-top:18px}
+footer a{color:var(--accent)}
+@media (max-width:980px){ .kpis{grid-template-columns:repeat(3,1fr)} .controls,.grid2,.grid2b{grid-template-columns:1fr} }
+@media (max-width:560px){ .kpis{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Germany Energy Transition <span class="thin">Dashboard</span></h1>
+      <div class="sub">The Energiewende in numbers, 2000–2024 · Germany with France, Poland &amp; Denmark · Data: Our World in Data</div>
+    </div>
+    <div class="links">
+      <a href="https://github.com/rashedrana/germany-renewable-energy-analysis" target="_blank" rel="noopener">GitHub Project</a>
+      <a href="https://github.com/rashedrana/germany-renewable-energy-analysis" target="_blank" rel="noopener">Research Paper (repo)</a>
+      <a href="https://rashedrana.github.io" target="_blank" rel="noopener">Portfolio</a>
+    </div>
+  </header>
+
+  <!-- ============ SLICERS ============ -->
+  <div class="panel">
+    <div class="controls">
+      <div>
+        <h3>Country (main view)</h3>
+        <div class="btnrow" id="countryBtns"></div>
+      </div>
+      <div>
+        <h3>Focus year</h3>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="yearbig" id="yearBig">2024</div>
+          <div style="flex:1">
+            <input type="range" id="yearSlider" min="2000" max="2024" step="1" value="2024">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>2000</span><span>2024</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>Trend chart shows</h3>
+        <div class="btnrow" id="metricBtns">
+          <button class="cbtn on" data-m="ren">Renewable share</button>
+          <button class="cbtn" data-m="ci">Carbon intensity</button>
+          <button class="cbtn" data-m="co2pc">CO₂ per capita</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ KPI CARDS ============ -->
+  <div class="kpis" id="kpis"></div>
+
+  <!-- ============ CHARTS ROW 1 ============ -->
+  <div class="grid2">
+    <div class="panel">
+      <h3 id="trendTitle">Renewable share of electricity (%)</h3>
+      <div style="margin-bottom:8px" class="btnrow" id="trendToggles"></div>
+      <div class="chartbox"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3 id="compareTitle">Renewable share by country — 2024</h3>
+      <div class="chartbox"><canvas id="compareChart"></canvas></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Click a bar to make that country the main view.</div>
+    </div>
+  </div>
+
+  <!-- ============ CHARTS ROW 2 ============ -->
+  <div class="grid2b">
+    <div class="panel">
+      <h3 id="mixTitle">Electricity mix — Germany (TWh, stacked)</h3>
+      <div class="chartbox sm"><canvas id="mixChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3 id="srcTitle">Generation by source — Germany, 2024 (TWh)</h3>
+      <div class="chartbox sm"><canvas id="srcChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 id="ciTitle">Carbon intensity vs renewable share — Germany</h3>
+    <div class="chartbox sm"><canvas id="ciChart"></canvas></div>
+  </div>
+
+  <footer>
+    Built by <strong>Rashed Rana</strong> as the interactive companion to the research paper
+    <em>“Germany's Renewable Energy Transition, 2000–2024”</em> — the full analysis, SQL queries and paper live in the
+    <a href="https://github.com/rashedrana/germany-renewable-energy-analysis" target="_blank" rel="noopener">GitHub project</a>.
+    This web edition mirrors the Power BI report (star-schema model, DAX measures and page layout in the repo under
+    <code>dashboard/powerbi/</code>). Data: Our World in Data energy &amp; CO₂ datasets, accessed 2026.
+  </footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/{};
+const YEARS = DATA.years;
+const CCOLORS = {Germany:"#7c3aed", France:"#0078d4", Poland:"#dc2626", Denmark:"#059669"};
+const SCOLORS = {Coal:"#57534e", Gas:"#d97706", Nuclear:"#9333ea", Hydro:"#0284c7", Wind:"#059669", Solar:"#eab308", "Other Renewables":"#84cc16"};
+const METRICS = {
+  ren:  {label:"Renewable share of electricity (%)", unit:"%"},
+  ci:   {label:"Carbon intensity of electricity (gCO₂/kWh)", unit:" gCO₂/kWh"},
+  co2pc:{label:"CO₂ emissions per capita (tonnes)", unit:" t"}
+};
+let primary = "Germany", focusYear = 2024, metric = "ren";
+let trendOn = {Germany:true, France:true, Poland:true, Denmark:true};
+
+Chart.defaults.font.family = "-apple-system,'Segoe UI',Roboto,sans-serif";
+Chart.defaults.color = "#6d6879";
+
+const yi = y => YEARS.indexOf(y);
+const S = c => DATA.series[c];
+
+/* ---------- controls ---------- */
+const cb = document.getElementById("countryBtns");
+DATA.countries.forEach(c=>{
+  const b=document.createElement("button"); b.className="cbtn"+(c===primary?" on":""); b.textContent=c;
+  b.onclick=()=>{ primary=c; cb.querySelectorAll(".cbtn").forEach(x=>x.classList.toggle("on",x.textContent===c)); refresh(); };
+  cb.appendChild(b);
+});
+const tt = document.getElementById("trendToggles");
+DATA.countries.forEach(c=>{
+  const b=document.createElement("button"); b.className="cbtn tgl on"; b.textContent=c; b.style.borderColor=CCOLORS[c];
+  b.onclick=()=>{ trendOn[c]=!trendOn[c]; b.classList.toggle("on",trendOn[c]); drawTrend(); };
+  tt.appendChild(b);
+});
+document.getElementById("yearSlider").addEventListener("input", e=>{
+  focusYear = +e.target.value; document.getElementById("yearBig").textContent = focusYear; refresh();
+});
+document.querySelectorAll("#metricBtns .cbtn").forEach(b=>{
+  b.onclick=()=>{ metric=b.dataset.m; document.querySelectorAll("#metricBtns .cbtn").forEach(x=>x.classList.toggle("on",x===b)); drawTrend(); };
+});
+
+/* ---------- KPI cards ---------- */
+function kpiHTML(){
+  const s=S(primary), i=yi(focusYear), i0=yi(2000);
+  const ws = s.shares.Wind[i]+s.shares.Solar[i], ws0 = s.shares.Wind[i0]+s.shares.Solar[i0];
+  const cards=[
+    {v:s.ren[i].toFixed(1), u:"%", l:"Renewable share", d:s.ren[i]-s.ren[i0], du:"pp vs 2000", goodUp:true},
+    {v:Math.round(s.ci[i]), u:"gCO₂/kWh", l:"Carbon intensity", d:s.ci[i]-s.ci[i0], du:"vs 2000", goodUp:false, fmt:0},
+    {v:s.co2pc[i].toFixed(2), u:"t", l:"CO₂ per capita", d:s.co2pc[i]-s.co2pc[i0], du:"t vs 2000", goodUp:false},
+    {v:Math.round(s.gen[i]), u:"TWh", l:"Total generation", d:s.gen[i]-s.gen[i0], du:"TWh vs 2000", goodUp:true, fmt:0},
+    {v:s.shares.Coal[i].toFixed(1), u:"%", l:"Coal share", d:s.shares.Coal[i]-s.shares.Coal[i0], du:"pp vs 2000", goodUp:false},
+    {v:ws.toFixed(1), u:"%", l:"Wind + Solar share", d:ws-ws0, du:"pp vs 2000", goodUp:true}
+  ];
+  return cards.map(c=>{
+    const up = c.d>0.05, dn = c.d<-0.05;
+    const cls = !up && !dn ? "flat" : ((up && c.goodUp) || (dn && !c.goodUp) ? "up" : "dn");
+    const arrow = up ? "▲" : dn ? "▼" : "■";
+    const dv = (c.fmt===0 ? Math.round(c.d) : c.d.toFixed(1));
+    return `<div class="kpi"><div><span class="v">${c.v}</span> <span class="u">${c.u}</span></div><div class="l">${c.l} — ${primary}, ${focusYear}</div><div class="d ${cls}">${arrow} ${dv>0?"+":""}${dv} ${c.du}</div></div>`;
+  }).join("");
+}
+
+/* ---------- charts ---------- */
+let trendChart, compareChart, mixChart, srcChart, ciChart;
+function drawTrend(){
+  const ds = DATA.countries.filter(c=>trendOn[c]).map(c=>({
+    label:c, data:S(c)[metric], borderColor:CCOLORS[c], backgroundColor:CCOLORS[c],
+    borderWidth: c===primary?3:2, pointRadius:0, pointHoverRadius:4, tension:.25
+  }));
+  document.getElementById("trendTitle").textContent = METRICS[metric].label;
+  if(trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById("trendChart"), {type:"line",
+    data:{labels:YEARS, datasets:ds},
+    options:{responsive:true, maintainAspectRatio:false, interaction:{mode:"index", intersect:false},
+      scales:{y:{beginAtZero:true, grid:{color:"#eee9f7"}}, x:{grid:{display:false}, ticks:{maxTicksLimit:9}}},
+      plugins:{legend:{position:"bottom"}}}});
+}
+function drawCompare(){
+  document.getElementById("compareTitle").textContent = `Renewable share by country — ${focusYear}`;
+  const vals = DATA.countries.map(c=>S(c).ren[yi(focusYear)]);
+  if(compareChart) compareChart.destroy();
+  compareChart = new Chart(document.getElementById("compareChart"), {type:"bar",
+    data:{labels:DATA.countries, datasets:[{data:vals, backgroundColor:DATA.countries.map(c=>CCOLORS[c]), borderRadius:6}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      scales:{y:{beginAtZero:true, max:100, title:{display:true, text:"% of electricity"}}, x:{grid:{display:false}}},
+      plugins:{legend:{display:false}},
+      onClick:(e,els)=>{ if(els.length){ const c=DATA.countries[els[0].index]; primary=c;
+        cb.querySelectorAll(".cbtn").forEach(x=>x.classList.toggle("on",x.textContent===c)); refresh(); } }}});
+}
+function drawMix(){
+  document.getElementById("mixTitle").textContent = `Electricity mix — ${primary} (TWh, stacked)`;
+  const names = Object.keys(SCOLORS);
+  if(mixChart) mixChart.destroy();
+  mixChart = new Chart(document.getElementById("mixChart"), {type:"bar",
+    data:{labels:YEARS, datasets:names.map(n=>({label:n, data:S(primary).sources[n], backgroundColor:SCOLORS[n], stack:"m", borderWidth:0}))},
+    options:{responsive:true, maintainAspectRatio:false,
+      scales:{x:{stacked:true, grid:{display:false}, ticks:{maxTicksLimit:9}}, y:{stacked:true, title:{display:true, text:"TWh"}}},
+      plugins:{legend:{position:"bottom", labels:{boxWidth:11, font:{size:10.5}}}}}});
+}
+function drawSrc(){
+  document.getElementById("srcTitle").textContent = `Generation by source — ${primary}, ${focusYear} (TWh)`;
+  const names = Object.keys(SCOLORS);
+  const pairs = names.map(n=>[n, S(primary).sources[n][yi(focusYear)]]).sort((a,b)=>b[1]-a[1]);
+  if(srcChart) srcChart.destroy();
+  srcChart = new Chart(document.getElementById("srcChart"), {type:"bar",
+    data:{labels:pairs.map(p=>p[0]), datasets:[{data:pairs.map(p=>p[1]), backgroundColor:pairs.map(p=>SCOLORS[p[0]]), borderRadius:6}]},
+    options:{indexAxis:"y", responsive:true, maintainAspectRatio:false,
+      scales:{x:{title:{display:true, text:"TWh"}}, y:{grid:{display:false}}}, plugins:{legend:{display:false}}}});
+}
+function drawCI(){
+  document.getElementById("ciTitle").textContent = `Carbon intensity vs renewable share — ${primary}`;
+  if(ciChart) ciChart.destroy();
+  ciChart = new Chart(document.getElementById("ciChart"), {type:"line",
+    data:{labels:YEARS, datasets:[
+      {label:"Carbon intensity (gCO₂/kWh)", data:S(primary).ci, borderColor:"#dc2626", backgroundColor:"#dc2626", yAxisID:"y", borderWidth:2.5, pointRadius:0, tension:.25},
+      {label:"Renewable share (%)", data:S(primary).ren, borderColor:"#059669", backgroundColor:"#059669", yAxisID:"y1", borderWidth:2.5, pointRadius:0, tension:.25}]},
+    options:{responsive:true, maintainAspectRatio:false, interaction:{mode:"index", intersect:false},
+      scales:{y:{position:"left", title:{display:true, text:"gCO₂/kWh"}}, y1:{position:"right", min:0, max:100, grid:{drawOnChartArea:false}, title:{display:true, text:"%"}},
+        x:{grid:{display:false}, ticks:{maxTicksLimit:11}}},
+      plugins:{legend:{position:"bottom"}}}});
+}
+function refresh(){
+  document.getElementById("kpis").innerHTML = kpiHTML();
+  drawTrend(); drawCompare(); drawMix(); drawSrc(); drawCI();
+}
+refresh();
+</script>
+</body>
+</html>
