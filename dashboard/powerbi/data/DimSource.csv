@@ -1,0 +1,8 @@
+SourceKey,Source,Category,IsRenewable
+1,Coal,Fossil,0
+2,Gas,Fossil,0
+3,Nuclear,Nuclear,0
+4,Hydro,Renewable,1
+5,Wind,Renewable,1
+6,Solar,Renewable,1
+7,Other Renewables,Renewable,1
