@@ -42,6 +42,24 @@ input[type=range]{width:100%;accent-color:var(--accent);margin-top:8px}
 .grid2b{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .chartbox{position:relative;height:300px}
 .chartbox.sm{height:262px}
+.mapbox{position:relative}
+.mapbox svg{width:100%;height:auto;display:block}
+.maplegend{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.mapgrad{flex:0 0 170px;height:10px;border-radius:5px;background:linear-gradient(90deg,#e9f5ef,#7fc7a5,#046c4e)}
+.mapnodata{display:inline-block;width:12px;height:12px;border-radius:3px;background:#e3e0ec;vertical-align:-2px;margin-right:4px}
+.maptip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:5px 9px;border-radius:7px;opacity:0;transition:opacity .12s;white-space:nowrap;z-index:5}
+.hm{border-collapse:separate;border-spacing:3px;width:100%}
+.hm th{font-size:11px;color:var(--muted);font-weight:600;text-align:center;padding:2px}
+.hm th.cn{text-align:left;font-size:12px;color:var(--ink)}
+.hm td{border-radius:6px;text-align:center;font-size:11.5px;font-weight:700;padding:6px 2px;color:#17352a}
+.wf{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:340px}
+.wf i{aspect-ratio:1;border-radius:3px;display:block}
+.wflegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:10px}
+.wflegend b{color:var(--ink)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.srcgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:13px}
+.srcgrid .k{font-size:11px;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+@media (max-width:980px){ .srcgrid{grid-template-columns:repeat(2,1fr)} }
 footer{color:var(--muted);font-size:12px;line-height:1.7;margin-top:18px}
 footer a{color:var(--accent)}
 @media (max-width:980px){ .kpis{grid-template-columns:repeat(3,1fr)} .controls,.grid2,.grid2b{grid-template-columns:1fr} }
@@ -125,6 +143,53 @@ footer a{color:var(--accent)}
     <div class="chartbox sm"><canvas id="ciChart"></canvas></div>
   </div>
 
+  <!-- ============ RETROFIT: ADVANCED VISUALS ============ -->
+  <div class="panel">
+    <h3>World map — renewable share of electricity, 2024 (%)</h3>
+    <div class="mapbox" id="mapBox"><div class="maptip" id="mapTip"></div></div>
+    <div class="maplegend"><span>0%</span><span class="mapgrad"></span><span>100% renewable</span>
+      <span style="margin-left:10px"><span class="mapnodata"></span>No data / not on simplified map</span></div>
+    <div style="font-size:12px;color:var(--muted);margin-top:6px">20 countries ran on ≥ 90% renewable electricity in 2024; seven (Albania, Bhutan, DR Congo, Ethiopia, Iceland, Nepal, Paraguay) reached 100%. Germany's 58.6% ranks #55 of 195 countries but #5 among the 36 large producers (≥ 100 TWh). 27 small island states in the data are not drawn on this simplified map.</div>
+  </div>
+
+  <div class="grid2b">
+    <div class="panel">
+      <h3>Heatmap — renewable share (%) of the 12 largest producers</h3>
+      <div id="heatmap"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">Germany improved most of the twelve: 6.2% → 58.6% (+52.4 pp). Brazil stays greenest (87.3%), Saudi Arabia lowest (2.2%).</div>
+    </div>
+    <div class="panel">
+      <h3>Slope chart — renewable share 2000 → 2024</h3>
+      <div id="slopeBox"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">Denmark climbed steepest (+73.7 pp). Poland started last of the four but overtook France by 2024 — the only rank swap.</div>
+    </div>
+  </div>
+
+  <div class="grid2b">
+    <div class="panel">
+      <h3>Waterfall — Germany generation bridge 2000 → 2024 (TWh)</h3>
+      <div class="chartbox sm"><canvas id="wfChart"></canvas></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">Total generation fell 569 → 496 TWh. Coal (−190) and the nuclear exit (−170) outweigh wind (+132), solar (+74), bioenergy (+47) and gas (+29). Bioenergy is split out of “Other renewables” and oil is included, per the raw OWID source columns.</div>
+    </div>
+    <div class="panel">
+      <h3>Waffle — Germany's 2024 electricity mix (1 square = 1%)</h3>
+      <div class="wf" id="waffle"></div>
+      <div class="wflegend" id="waffleLegend"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">Renewables hold 59 of the 100 squares; nuclear holds none.</div>
+    </div>
+  </div>
+
+  <!-- ============ DATA SOURCE ============ -->
+  <div class="panel">
+    <h3>Data source</h3>
+    <div class="srcgrid">
+      <div><div class="k">Source</div><strong>Our World in Data — Energy</strong> (OWID energy dataset, built on Ember &amp; EI data)</div>
+      <div><div class="k">Dataset</div><a href="https://github.com/owid/energy-data" target="_blank" rel="noopener">github.com/owid/energy-data</a> · <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener">ourworldindata.org/energy</a></div>
+      <div><div class="k">Coverage</div>213 countries · focus period 2000–2024 · <strong>36,897 fact rows</strong> (country × year × source) in the Power BI model</div>
+      <div><div class="k">Consistency</div>Every figure on this page matches the linked scientific paper <em>“Germany's Renewable Energy Transition, 2000–2024”</em> (same extract, cross-checked).</div>
+    </div>
+  </div>
+
   <footer>
     Built by <strong>Rashed Rana</strong> as the interactive companion to the research paper
     <em>“Germany's Renewable Energy Transition, 2000–2024”</em> — the full analysis, SQL queries and paper live in the
@@ -136,6 +201,7 @@ footer a{color:var(--accent)}
 
 <script>
 const DATA = /*__DATA__*/{};
+const WORLD = /*__GEO__*/{"type":"FeatureCollection","features":[]};
 const YEARS = DATA.years;
 const CCOLORS = {Germany:"#7c3aed", France:"#0078d4", Poland:"#dc2626", Denmark:"#059669"};
 const SCOLORS = {Coal:"#57534e", Gas:"#d97706", Nuclear:"#9333ea", Hydro:"#0284c7", Wind:"#059669", Solar:"#eab308", "Other Renewables":"#84cc16"};
@@ -258,6 +324,105 @@ function refresh(){
   drawTrend(); drawCompare(); drawMix(); drawSrc(); drawCI();
 }
 refresh();
+
+/* ---------- retrofit visuals (fixed exhibits, DATA.retrofit) ---------- */
+const R = DATA.retrofit;
+const WCOLORS = {Wind:"#059669", Solar:"#eab308", Bioenergy:"#84cc16", Hydro:"#0284c7",
+                 Coal:"#57534e", Gas:"#d97706", "Oil & other":"#a8a29e", Nuclear:"#9333ea"};
+function lerp(a,b,t){ return Math.round(a+(b-a)*t); }
+function renColor(v){ // 0..100 -> #e9f5ef .. #046c4e
+  const t = Math.max(0, Math.min(1, v/100));
+  return `rgb(${lerp(233,4,t)},${lerp(245,108,t)},${lerp(239,78,t)})`;
+}
+
+/* choropleth (SVG, equirectangular) */
+(function drawMap(){
+  const box = document.getElementById("mapBox"), tip = document.getElementById("mapTip");
+  const W=960, H=470, X=lon=>(lon+180)/360*W, Y=lat=>(90-lat)/180*H;
+  const ring = pts => pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join("")+"Z";
+  const geom = g => g.type==="Polygon" ? g.coordinates.map(ring).join("") :
+                    g.type==="MultiPolygon" ? g.coordinates.map(p=>p.map(ring).join("")).join("") : "";
+  let paths = "";
+  WORLD.features.forEach(f=>{
+    const v = R.renMap2024[f.id];
+    const fill = v===undefined ? "#e3e0ec" : renColor(v);
+    const name = R.mapNames[f.id] || f.id;
+    paths += `<path d="${geom(f.geometry)}" fill="${fill}" stroke="#ffffff" stroke-width="0.4" data-iso="${f.id}"><title>${name}${v===undefined?" — no 2024 data":": "+v.toFixed(1)+"% renewable (2024)"}</title></path>`;
+  });
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML = paths;
+  box.appendChild(svg);
+  svg.addEventListener("mousemove", e=>{
+    const t = e.target.closest("path"); if(!t){ tip.style.opacity=0; return; }
+    const v = R.renMap2024[t.dataset.iso], name = R.mapNames[t.dataset.iso] || t.dataset.iso;
+    tip.textContent = v===undefined ? `${name} — no data` : `${name}: ${v.toFixed(1)}% renewable`;
+    const r = box.getBoundingClientRect();
+    tip.style.left = (e.clientX-r.left+12)+"px"; tip.style.top = (e.clientY-r.top-8)+"px"; tip.style.opacity=1;
+  });
+  svg.addEventListener("mouseleave", ()=> tip.style.opacity=0);
+})();
+
+/* heatmap */
+(function drawHeat(){
+  const H = R.heatmap;
+  let html = `<table class="hm"><tr><th class="cn">Country</th>${H.years.map(y=>`<th>${y}</th>`).join("")}</tr>`;
+  H.countries.forEach(c=>{
+    html += `<tr><th class="cn">${c}<div style="font-weight:400;font-size:10.5px;color:var(--muted)">${H.gen2024[c].toLocaleString()} TWh in 2024</div></th>`;
+    H.values[c].forEach(v=>{
+      const bg = renColor(v), dark = v>52;
+      html += `<td style="background:${bg};color:${dark?"#ffffff":"#17352a"}" title="${c}: ${v.toFixed(1)}% renewable">${v.toFixed(0)}</td>`;
+    });
+    html += "</tr>";
+  });
+  document.getElementById("heatmap").innerHTML = html + "</table>";
+})();
+
+/* slope chart (SVG) */
+(function drawSlope(){
+  const W=460, H=300, PL=86, PR=86, PT=18, PB=14;
+  const X0=PL, X1=W-PR, Y=v=> PT+(100-v)/100*(H-PT-PB);
+  let s = "";
+  R.slope.forEach(d=>{
+    const col = CCOLORS[d.country];
+    s += `<line x1="${X0}" y1="${Y(d.v2000)}" x2="${X1}" y2="${Y(d.v2024)}" stroke="${col}" stroke-width="2.5"/>`;
+    s += `<circle cx="${X0}" cy="${Y(d.v2000)}" r="4" fill="${col}"/><circle cx="${X1}" cy="${Y(d.v2024)}" r="4" fill="${col}"/>`;
+    s += `<text x="${X0-8}" y="${Y(d.v2000)+4}" text-anchor="end" font-size="11.5" font-weight="700" fill="${col}">${d.country} ${d.v2000.toFixed(1)}</text>`;
+    s += `<text x="${X1+8}" y="${Y(d.v2024)+4}" font-size="11.5" font-weight="700" fill="${col}">${d.v2024.toFixed(1)} ${d.country}</text>`;
+  });
+  s += `<text x="${X0}" y="${H-1}" text-anchor="middle" font-size="11" fill="#6d6879">2000</text><text x="${X1}" y="${H-1}" text-anchor="middle" font-size="11" fill="#6d6879">2024</text>`;
+  document.getElementById("slopeBox").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${s}</svg>`;
+})();
+
+/* waterfall (Chart.js floating bars) */
+(function drawWaterfall(){
+  const wf = R.waterfall, labels=["2000 total"], bars=[[0, wf.start]], colors=["#7c3aed"];
+  let run = wf.start;
+  wf.steps.forEach(st=>{
+    const from = st.delta>=0 ? run : run+st.delta, to = st.delta>=0 ? run+st.delta : run;
+    bars.push([from,to]); labels.push(`${st.label} ${st.delta>=0?"+":""}${st.delta.toFixed(0)}`);
+    colors.push(st.delta>=0 ? "#059669" : "#dc2626"); run = to;
+  });
+  bars.push([0, wf.end]); labels.push("2024 total"); colors.push("#7c3aed");
+  new Chart(document.getElementById("wfChart"), {type:"bar",
+    data:{labels, datasets:[{data:bars, backgroundColor:colors, borderRadius:4}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      scales:{y:{title:{display:true, text:"TWh"}, grid:{color:"#eee9f7"}}, x:{grid:{display:false}, ticks:{font:{size:10}, maxRotation:55, minRotation:40}}},
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>{
+        const v=c.raw; return c.dataIndex===0||c.dataIndex===bars.length-1 ? `Total: ${v[1].toFixed(0)} TWh` : `Change: ${(v[1]-v[0]).toFixed(1)} TWh`;}}}}}});
+})();
+
+/* waffle */
+(function drawWaffle(){
+  const cells = [];
+  R.waffle.forEach(w=>{ for(let i=0;i<w.squares;i++) cells.push(w); });
+  document.getElementById("waffle").innerHTML =
+    cells.map(w=>`<i style="background:${WCOLORS[w.label]}" title="${w.label}: ${w.share.toFixed(1)}%"></i>`).join("");
+  document.getElementById("waffleLegend").innerHTML =
+    R.waffle.map(w=>`<span><span class="sw" style="background:${WCOLORS[w.label]}"></span><b>${w.label}</b> ${w.squares}%</span>`).join("") +
+    `<span><span class="sw" style="background:${WCOLORS.Nuclear}"></span><b>Nuclear</b> 0%</span>`;
+})();
+
 </script>
 </body>
 </html>
