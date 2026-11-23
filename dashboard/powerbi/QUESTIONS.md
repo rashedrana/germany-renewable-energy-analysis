@@ -1,5 +1,5 @@
 # Business Questions & Chart Problem-Solving
-## Germany Energy Transition Dashboard — 14 questions, 14 visual types
+## Germany Energy Transition Dashboard — 14 questions, 14 visual types (+ 5 retrofit questions, Q15–Q19)
 
 Dataset: Our World in Data energy + CO₂ (full extract in `powerbi/data/`):
 **213 countries · 2000–2024 · 36,897 fact rows** (country × year × source).
@@ -90,7 +90,56 @@ fastest in the years coal share dropped most (paper's regression analysis).
 
 ---
 
+## Retrofit questions (Q15–Q19) — advanced visuals added 2026-11-23
+
+**Q15. Which countries run on (almost) fully renewable electricity — and where
+does Germany sit on the world map?**
+Visual: **Choropleth map** (renewable share % by country, 2024; grey = no data).
+Answer: 20 countries reached ≥ 90% renewable electricity in 2024, and seven —
+Albania, Bhutan, DR Congo, Ethiopia, Iceland, Nepal and Paraguay — hit 100%
+(all hydro- or geothermal-based systems). Germany's 58.6% ranks only #55 of
+195 countries worldwide, but #5 among the 36 large producers (Q7) — small
+hydro states dominate the global list.
+
+**Q16. Among the world's 12 largest producers, who actually moved — and who
+stood still?**
+Visual: **Heatmap** (renewable share %, top-12 producers by 2024 generation ×
+2000 / 2005 / 2010 / 2015 / 2020 / 2024).
+Answer: Germany improved most of the twelve, 6.2% → 58.6% (+52.4 pp), ahead of
+China (+17.1 pp) and the USA (+14.8 pp). Brazil remains the greenest big system
+(87.3%, hydro-based), Canada second (64.3%); Saudi Arabia is the coldest row of
+the table at 2.2%, Iran next at 5.3%.
+
+**Q17. Can every terawatt-hour of Germany's 2000→2024 generation change be
+accounted for in one bridge?**
+Visual: **Waterfall chart** (full generation bridge, TWh; bioenergy split out
+of "Other renewables" and oil included, per the raw OWID source columns).
+Answer: Total generation fell 569.0 → 496.0 TWh (net −73.0). Losses: coal
+−190.4 and nuclear −169.6 TWh. Gains: wind +132.3, solar +74.1, bioenergy
++46.8, gas +29.2, hydro +2.1, oil & other +2.6 TWh. The bridge closes exactly:
+renewables growth replaced most — but not all — of the fossil/nuclear exit,
+so Germany generates less electricity overall than in 2000.
+
+**Q18. Which of the four focus countries climbed steepest — and did anyone
+change rank?**
+Visual: **Slope chart** (renewable share 2000 vs 2024, DEU / FRA / POL / DNK).
+Answer: Denmark climbed steepest, 15.5% → 89.2% (+73.7 pp); Germany rose
+6.2% → 58.6% (+52.4 pp). Poland started last (1.6%) but overtook France by
+2024 (31.2% vs 27.2%) — the only rank swap among the four; France, held back
+by its nuclear-heavy mix, gained least (+14.4 pp).
+
+**Q19. What does Germany's 2024 mix look like as 100 squares?**
+Visual: **Waffle chart** (10 × 10 grid, 1 square = 1% of generation, Germany
+2024; largest-remainder rounding).
+Answer: Wind 29 squares, coal 21, gas 16, solar 15, bioenergy 10, hydro 5,
+oil & other 4, nuclear 0. Renewables hold 59 of the 100 squares — one square
+short of the exact 58.6% after rounding.
+
+---
+
 Coverage checklist (Power BI visual palette): KPI card ✓ · gauge ✓ · line ✓ ·
 stacked column ✓ · 100% stacked column ✓ · waterfall ✓ · clustered bar ✓ ·
 donut ✓ · treemap ✓ · scatter ✓ · filled map ✓ · ribbon ✓ · matrix ✓ ·
 decomposition tree ✓ — plus slicers, bookmarks and drill-through (layout spec).
+Retrofit additions: choropleth map ✓ · heatmap ✓ · slope chart ✓ · waffle ✓ ·
+full-bridge waterfall (Q17 variant) ✓ — 19 questions, 18 visual types.

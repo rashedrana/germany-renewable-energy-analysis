@@ -132,6 +132,63 @@ Selected Year Label =
 
 ---
 
+## Additional measures — retrofit visuals (Q15–Q19)
+
+For the choropleth map (Q15) and heatmap (Q16) — the map colours by the
+existing `Renewable Share %`; this companion counts how many countries clear
+a threshold in the selected year:
+
+```dax
+Countries Above Renewable Threshold =
+VAR Threshold = 90
+RETURN
+    CALCULATE (
+        DISTINCTCOUNT ( DimCountry[Country] ),
+        FILTER (
+            ALL ( DimCountry[Country] ),
+            [Renewable Share %] >= Threshold
+        )
+    )
+```
+(2024, threshold 90 → 20 countries; threshold 100 → 7 countries.)
+
+For the waterfall bridge (Q17) — change in generation per source between two
+slicer-independent anchor years:
+
+```dax
+Generation Change 2000-2024 (TWh) =
+CALCULATE ( [Total Generation (TWh)], DimYear[Year] = 2024 )
+    - CALCULATE ( [Total Generation (TWh)], DimYear[Year] = 2000 )
+```
+Note: the star model's `Other Renewables` source combines bioenergy with
+other renewables, and oil is not a separate source in `FactGeneration`; the
+web edition's bridge splits bioenergy out and adds oil & other from the raw
+OWID columns (`biofuel_electricity`, `oil_electricity`), so its start/end
+totals (569.0 / 496.0 TWh) tie to `FactCountryYear`, not to the
+`FactGeneration` source sum.
+
+For the slope chart (Q18):
+
+```dax
+Renewable Share Change 2000-2024 (pp) =
+CALCULATE ( [Renewable Share %], DimYear[Year] = 2024 )
+    - CALCULATE ( [Renewable Share %], DimYear[Year] = 2000 )
+```
+
+For the waffle chart (Q19) — source share of the selected country-year:
+
+```dax
+Source Share % =
+DIVIDE (
+    [Total Generation (TWh)],
+    CALCULATE ( [Total Generation (TWh)], ALL ( DimSource[Source] ) )
+) * 100
+```
+Feed it to a 100-cell waffle visual; the web edition rounds by largest
+remainder so the cells sum to exactly 100.
+
+---
+
 Notes
 - `DimSource[IsRenewable]` is stored as 1/0 in the CSV; in Power Query convert it to True/False (or use `= 1` in the CALCULATE filters above).
 - KPI cards on Page 1 use: Renewable Share %, Avg Carbon Intensity, Avg CO2 per Capita, Total Generation (TWh), Coal Share %, Wind + Solar Share % — each with its "vs 2000" companion measure as the delta visual.
