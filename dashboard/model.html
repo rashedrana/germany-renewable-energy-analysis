@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Germany Energy Transition — Data Model</title>
+<meta name="description" content="Star-schema data model, table dictionary and data preparation behind the Germany Energy Transition dashboard by Rashed Rana.">
+<style>
+:root{
+  --bg:#f7f6fa; --card:#ffffff; --ink:#1e1b26; --muted:#6d6879; --border:#e4e0ee;
+  --accent:#7c3aed; --accent2:#0078d4;
+  --shadow:0 6px 22px rgba(30,20,60,.08); --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 46px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+h1{font-size:25px;line-height:1.2}
+h1 .thin{color:var(--accent)}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a{font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--card);padding:7px 12px;border-radius:999px;color:var(--ink);text-decoration:none}
+.links a:hover{border-color:var(--accent);color:var(--accent)}
+.links a.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.panel h3{font-size:13px;letter-spacing:1.1px;color:var(--muted);margin-bottom:10px;text-transform:uppercase}
+.lead{font-size:14.5px;line-height:1.65;margin-bottom:14px}
+.lead b{color:var(--accent)}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.svgb{fill:#ffffff;stroke:#e4e0ee}
+.svgf{fill:#f1eafd;stroke:#7c3aed;stroke-width:1.5}
+.svgl{stroke:#7c3aed;stroke-width:1.3;opacity:.6}
+.svgt{fill:#1e1b26;font-weight:600}
+.svgs{fill:#6d6879}
+.svgn{fill:#7c3aed;font-weight:600}
+.caption{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6}
+.scrollx{overflow-x:auto}
+table.dict{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.dict th{text-align:left;font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--border)}
+.dict td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.dict tr:last-child td{border-bottom:none}
+.dict td.t{font-weight:700;white-space:nowrap}
+.dict td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.dict .k{color:var(--muted)}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.7px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted);margin-left:8px;vertical-align:2px;text-transform:uppercase}
+.tag.fact{color:var(--accent);border-color:var(--accent)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.subbox{border:1px solid var(--border);border-radius:10px;padding:14px}
+.subbox h4{font-size:13.5px;margin-bottom:6px}
+.subbox p{font-size:13px;color:var(--muted);line-height:1.65}
+ul.clean{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7}
+ul.clean li{margin-bottom:7px}
+footer{color:var(--muted);font-size:12px;line-height:1.7;margin-top:18px}
+footer a{color:var(--accent)}
+@media (max-width:860px){ .cols{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Germany Energy Transition <span class="thin">Data Model</span></h1>
+      <div class="sub">How the dashboard&rsquo;s Power BI model is structured, and how the data was prepared &middot; Data: Our World in Data</div>
+    </div>
+    <div class="links">
+      <a href="index.html">Dashboard</a>
+      <a href="model.html" class="on">Data Model</a>
+      <a href="https://github.com/rashedrana/germany-renewable-energy-analysis" target="_blank" rel="noopener">GitHub Project</a>
+      <a href="https://github.com/rashedrana/germany-renewable-energy-analysis" target="_blank" rel="noopener">Research Paper (repo)</a>
+      <a href="https://rashedrana.github.io" target="_blank" rel="noopener">Portfolio</a>
+    </div>
+  </header>
+
+  <p class="lead">Star schema &middot; <b>2 fact tables</b> &middot; <b>3 dimensions</b> &middot; the report is built on the full OWID extract: <b>213 countries</b>, with FactGeneration_Full carrying <b>36,897 rows</b> &middot; Source: Our World in Data energy &amp; CO&#8322; datasets</p>
+
+  <div class="panel">
+    <h3>Star schema</h3>
+    <svg viewBox="0 0 820 320" role="img" aria-label="Star schema diagram"><g><line class="svgl" x1="145" y1="82" x2="205" y2="225"/><line class="svgl" x1="145" y1="82" x2="520" y2="225"/><line class="svgl" x1="410" y1="82" x2="290" y2="225"/><line class="svgl" x1="410" y1="82" x2="540" y2="225"/><line class="svgl" x1="675" y1="82" x2="615" y2="225"/><rect class="svgb" x="60" y="30" width="170" height="52" rx="9"/><text class="svgt" x="145.0" y="53.0" text-anchor="middle" font-size="12.5">DimCountry</text><text class="svgs" x="145.0" y="71.0" text-anchor="middle" font-size="10.5">4 rows · paper panel</text><rect class="svgb" x="325" y="30" width="170" height="52" rx="9"/><text class="svgt" x="410.0" y="53.0" text-anchor="middle" font-size="12.5">DimYear</text><text class="svgs" x="410.0" y="71.0" text-anchor="middle" font-size="10.5">25 rows · 2000–2024</text><rect class="svgb" x="590" y="30" width="170" height="52" rx="9"/><text class="svgt" x="675.0" y="53.0" text-anchor="middle" font-size="12.5">DimSource</text><text class="svgs" x="675.0" y="71.0" text-anchor="middle" font-size="10.5">7 rows · incl. IsRenewable</text><rect class="svgf" x="130" y="225" width="230" height="64" rx="9"/><text class="svgt" x="245.0" y="254.0" text-anchor="middle" font-size="12.5">FactCountryYear</text><text class="svgs" x="245.0" y="272.0" text-anchor="middle" font-size="10.5">100 rows · country × year</text><rect class="svgf" x="460" y="225" width="230" height="64" rx="9"/><text class="svgt" x="575.0" y="254.0" text-anchor="middle" font-size="12.5">FactGeneration</text><text class="svgs" x="575.0" y="272.0" text-anchor="middle" font-size="10.5">700 rows · country × year × source</text><text class="svgn" x="150" y="158" font-size="10">1 &#8594; *</text><text class="svgn" x="238" y="112" font-size="10">1 &#8594; *</text><text class="svgn" x="345" y="158" font-size="10">1 &#8594; *</text><text class="svgn" x="462" y="146" font-size="10">1 &#8594; *</text><text class="svgn" x="650" y="146" font-size="10">1 &#8594; *</text></g></svg>
+    <div class="caption">The two facts share the conformed DimCountry and DimYear dimensions; DimSource hangs off FactGeneration only. The report is built on the _Full tables (same schema, all 213 countries); the 4-country tables above are the research paper&rsquo;s extract.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Table dictionary</h3>
+    <div class="scrollx"><table class="dict">
+      <tr><th>Table</th><th>Grain</th><th style="text-align:right">Rows</th><th>Key columns &amp; contents</th></tr>
+          <tr><td class="t">FactGeneration<span class="tag fact">Fact</span></td><td>country &times; year &times; source</td><td class="n">700</td><td>CountryKey, YearKey, SourceKey <span class='k'>(FKs)</span> &middot; Generation_TWh, Share_Pct</td></tr>
+          <tr><td class="t">FactCountryYear<span class="tag fact">Fact</span></td><td>country &times; year</td><td class="n">100</td><td>CountryKey, YearKey <span class='k'>(FKs)</span> &middot; RenewableShare_Pct, CarbonIntensity_gCO2_kWh, CO2_PerCapita_t, TotalGeneration_TWh, ElectricityDemand_TWh</td></tr>
+          <tr><td class="t">FactGeneration_Full<span class="tag fact">Fact</span></td><td>country &times; year &times; source</td><td class="n">36,897</td><td><span class='k'>Full OWID extract &mdash; all 213 countries, same grain and columns as FactGeneration</span></td></tr>
+          <tr><td class="t">FactCountryYear_Full<span class="tag fact">Fact</span></td><td>country &times; year</td><td class="n">5,271</td><td><span class='k'>Full OWID extract &mdash; all 213 countries, same grain and columns as FactCountryYear</span></td></tr>
+          <tr><td class="t">DimCountry<span class="tag">Dim</span></td><td>country</td><td class="n">4</td><td>CountryKey <span class='k'>(PK)</span> &middot; Country, ISO_Code &mdash; Germany, France, Poland, Denmark</td></tr>
+          <tr><td class="t">DimCountry_Full<span class="tag">Dim</span></td><td>country</td><td class="n">213</td><td>CountryKey <span class='k'>(PK)</span> &middot; every country in the OWID extract</td></tr>
+          <tr><td class="t">DimYear<span class="tag">Dim</span></td><td>year</td><td class="n">25</td><td>YearKey <span class='k'>(PK)</span> &middot; Year, Decade &mdash; 2000&ndash;2024</td></tr>
+          <tr><td class="t">DimSource<span class="tag">Dim</span></td><td>source</td><td class="n">7</td><td>SourceKey <span class='k'>(PK)</span> &middot; Source, Category, IsRenewable &mdash; Coal, Gas, Nuclear, Hydro, Wind, Solar, Other Renewables</td></tr>
+    </table></div>
+  </div>
+
+  <div class="panel">
+    <h3>Structured &amp; unstructured data</h3>
+    <div class="cols">
+      <div class="subbox"><h4>Structured data</h4><p>Our World in Data&rsquo;s energy and CO&#8322; datasets are a fully structured statistical panel &mdash; one row per country-year (and per source) with published numeric measures. The model keeps two sizes side by side: the paper&rsquo;s 4-country extract (100 country-years) and the full 213-country extract the report is built on.</p></div>
+      <div class="subbox"><h4>Unstructured data</h4><p>Fully structured source &mdash; no free text. The OWID datasets contain no comments, documents or other unstructured content, so no text processing was needed; every value in the model is a published numeric statistic.</p></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>How the data was cleaned</h3>
+    <ul class="clean">
+      <li>&ldquo;Other Renewables&rdquo; is derived during data prep &mdash; total renewables &minus; (hydro + wind + solar), i.e. mostly bioenergy and geothermal &mdash; computed so the electricity mix stacks exactly to the published totals.</li><li>Two fact shapes share the conformed DimCountry and DimYear: source-level generation detail (FactGeneration) alongside country-year indicators that have no source dimension, such as carbon intensity and CO&#8322; per capita (FactCountryYear).</li><li>No gaps in the series used: the paper&rsquo;s extract is a complete 4 countries &times; 25 years (2000&ndash;2024).</li><li>The dashboard, the QUESTIONS answers and the research paper all read the same source file (<code>data/analysis_subset.csv</code> in the repo), so every number agrees across the three.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Model documentation for the Power BI edition of this dashboard &mdash; the star-schema CSVs, DAX measures,
+    business questions and page layout live in the repo under <code>dashboard/powerbi/</code>.
+    Built by <strong>Rashed Rana</strong> &middot; <a href="index.html">Back to the dashboard</a>
+  </footer>
+</div>
+</body>
+</html>
