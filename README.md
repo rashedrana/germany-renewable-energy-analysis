@@ -12,6 +12,14 @@ Every number below is produced by `src/analysis.py` / `sql/queries.sql` and
 stored in `outputs/results.json` / `outputs/sql_results.md`; nothing is typed
 by hand.
 
+## Citation
+
+If you use this work, please cite the preprint:
+
+Rana, R. (2026). From 6% to 59%: A Data Analysis of Germany's Renewable Electricity Transition, 2000–2024, with a Comparison to France, Poland and Denmark. Zenodo. https://doi.org/10.5281/zenodo.24584097
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24584097.svg)](https://doi.org/10.5281/zenodo.24584097)
+
 ## Key findings
 
 1. **Renewables grew nine-fold.** Their share of Germany's electricity rose
