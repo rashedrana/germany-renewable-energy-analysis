@@ -59,6 +59,10 @@ input[type=range]{width:100%;accent-color:var(--accent);margin-top:8px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .srcgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:13px}
 .srcgrid .k{font-size:11px;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.fixed-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:none;color:var(--muted);border:1px solid var(--border);background:var(--bg);border-radius:999px;padding:2px 8px;margin-left:8px;vertical-align:2px}
+.statline{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.55}
+.statline b{color:var(--ink)}
+.note{font-size:11.5px;color:var(--muted);margin-top:8px}
 @media (max-width:980px){ .srcgrid{grid-template-columns:repeat(2,1fr)} }
 footer{color:var(--muted);font-size:12px;line-height:1.7;margin-top:18px}
 footer a{color:var(--accent)}
@@ -118,11 +122,14 @@ footer a{color:var(--accent)}
       <h3 id="trendTitle">Renewable share of electricity (%)</h3>
       <div style="margin-bottom:8px" class="btnrow" id="trendToggles"></div>
       <div class="chartbox"><canvas id="trendChart"></canvas></div>
+      <div class="statline" id="statTrend"></div>
+      <div class="note">Full 2000–2024 series — the year slider sets the focus year for the KPI cards and single-year panels, not this axis.</div>
     </div>
     <div class="panel">
       <h3 id="compareTitle">Renewable share by country — 2024</h3>
       <div class="chartbox"><canvas id="compareChart"></canvas></div>
       <div style="font-size:12px;color:var(--muted);margin-top:8px">Click a bar to make that country the main view.</div>
+      <div class="statline" id="statCompare"></div>
     </div>
   </div>
 
@@ -131,51 +138,56 @@ footer a{color:var(--accent)}
     <div class="panel">
       <h3 id="mixTitle">Electricity mix — Germany (TWh, stacked)</h3>
       <div class="chartbox sm"><canvas id="mixChart"></canvas></div>
+      <div class="statline" id="statMix"></div>
+      <div class="note">Full 2000–2024 series — the year slider sets the focus year for the KPI cards and single-year panels, not this axis.</div>
     </div>
     <div class="panel">
       <h3 id="srcTitle">Generation by source — Germany, 2024 (TWh)</h3>
       <div class="chartbox sm"><canvas id="srcChart"></canvas></div>
+      <div class="statline" id="statSrc"></div>
     </div>
   </div>
 
   <div class="panel">
     <h3 id="ciTitle">Carbon intensity vs renewable share — Germany</h3>
     <div class="chartbox sm"><canvas id="ciChart"></canvas></div>
+    <div class="statline" id="statCI"></div>
+    <div class="note">Full 2000–2024 series — the year slider sets the focus year for the KPI cards and single-year panels, not this axis.</div>
   </div>
 
   <!-- ============ RETROFIT: ADVANCED VISUALS ============ -->
   <div class="panel">
-    <h3>World map — renewable share of electricity, 2024 (%)</h3>
+    <h3>World map — renewable share of electricity, 2024 (%)<span class="fixed-badge">Fixed comparison — ignores slicers by design</span></h3>
     <div class="mapbox" id="mapBox"><div class="maptip" id="mapTip"></div></div>
     <div class="maplegend"><span>0%</span><span class="mapgrad"></span><span>100% renewable</span>
       <span style="margin-left:10px"><span class="mapnodata"></span>No data / not on simplified map</span></div>
-    <div style="font-size:12px;color:var(--muted);margin-top:6px">20 countries ran on ≥ 90% renewable electricity in 2024; seven (Albania, Bhutan, DR Congo, Ethiopia, Iceland, Nepal, Paraguay) reached 100%. Germany's 58.6% ranks #55 of 195 countries but #5 among the 36 large producers (≥ 100 TWh). 27 small island states in the data are not drawn on this simplified map.</div>
+    <div class="statline"><b>Stat:</b> 20 of 195 countries ran on ≥ 90% renewable electricity in 2024; seven (Albania, Bhutan, DR Congo, Ethiopia, Iceland, Nepal, Paraguay) reached 100%. <b>Takeaway:</b> small hydro states dominate the global list — Germany is #55 worldwide but #5 among the 36 large producers (≥ 100 TWh). 27 small island states in the data are not drawn on this simplified map.</div>
   </div>
 
   <div class="grid2b">
     <div class="panel">
-      <h3>Heatmap — renewable share (%) of the 12 largest producers</h3>
+      <h3>Heatmap — renewable share (%) of the 12 largest producers<span class="fixed-badge">Fixed comparison — ignores slicers by design</span></h3>
       <div id="heatmap"></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Germany improved most of the twelve: 6.2% → 58.6% (+52.4 pp). Brazil stays greenest (87.3%), Saudi Arabia lowest (2.2%).</div>
+      <div class="statline"><b>Stat:</b> Germany improved most of the twelve: 6.2% → 58.6% (+52.4 pp, 2000→2024). Brazil stays greenest (87.3%), Saudi Arabia lowest (2.2%). <b>Takeaway:</b> the transition is fastest where policy pushed wind and solar.</div>
     </div>
     <div class="panel">
-      <h3>Slope chart — renewable share 2000 → 2024</h3>
+      <h3>Slope chart — renewable share 2000 → 2024<span class="fixed-badge">Fixed comparison — ignores slicers by design</span></h3>
       <div id="slopeBox"></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Denmark climbed steepest (+73.7 pp). Poland started last of the four but overtook France by 2024 — the only rank swap.</div>
+      <div class="statline"><b>Stat:</b> Denmark climbed steepest (+73.7 pp); France gained least (+14.4 pp). Poland started last of the four but overtook France by 2024 — the only rank swap. <b>Takeaway:</b> Denmark, not Germany, is the fastest mover of the four.</div>
     </div>
   </div>
 
   <div class="grid2b">
     <div class="panel">
-      <h3>Waterfall — Germany generation bridge 2000 → 2024 (TWh)</h3>
+      <h3>Waterfall — Germany generation bridge 2000 → 2024 (TWh)<span class="fixed-badge">Fixed comparison — ignores slicers by design</span></h3>
       <div class="chartbox sm"><canvas id="wfChart"></canvas></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Total generation fell 569 → 496 TWh. Coal (−190) and the nuclear exit (−170) outweigh wind (+132), solar (+74), bioenergy (+47) and gas (+29). Bioenergy is split out of “Other renewables” and oil is included, per the raw OWID source columns.</div>
+      <div class="statline"><b>Stat:</b> the bridge closes exactly — 569.0 + (−73.0) = 496.0 TWh. Coal (−190) and the nuclear exit (−170) outweigh wind (+132), solar (+74), bioenergy (+47) and gas (+29). <b>Takeaway:</b> renewables replaced most, but not all, of the fossil/nuclear exit, so Germany generates less electricity overall than in 2000. Bioenergy is split out of “Other renewables” and oil is included, per the raw OWID source columns.</div>
     </div>
     <div class="panel">
-      <h3>Waffle — Germany's 2024 electricity mix (1 square = 1%)</h3>
+      <h3>Waffle — Germany's 2024 electricity mix (1 square = 1%)<span class="fixed-badge">Fixed comparison — ignores slicers by design</span></h3>
       <div class="wf" id="waffle"></div>
       <div class="wflegend" id="waffleLegend"></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Renewables hold 59 of the 100 squares; nuclear holds none.</div>
+      <div class="statline"><b>Stat:</b> renewables hold 59 of the 100 squares vs the exact 58.6% (largest-remainder rounding); wind alone is 29 squares. <b>Takeaway:</b> wind is the single biggest slice of the mix; nuclear holds none.</div>
     </div>
   </div>
 
@@ -236,7 +248,7 @@ document.getElementById("yearSlider").addEventListener("input", e=>{
   focusYear = +e.target.value; document.getElementById("yearBig").textContent = focusYear; refresh();
 });
 document.querySelectorAll("#metricBtns .cbtn").forEach(b=>{
-  b.onclick=()=>{ metric=b.dataset.m; document.querySelectorAll("#metricBtns .cbtn").forEach(x=>x.classList.toggle("on",x===b)); drawTrend(); };
+  b.onclick=()=>{ metric=b.dataset.m; document.querySelectorAll("#metricBtns .cbtn").forEach(x=>x.classList.toggle("on",x===b)); drawTrend(); drawStats(); };
 });
 
 /* ---------- KPI cards ---------- */
@@ -321,7 +333,74 @@ function drawCI(){
 }
 function refresh(){
   document.getElementById("kpis").innerHTML = kpiHTML();
-  drawTrend(); drawCompare(); drawMix(); drawSrc(); drawCI();
+  drawTrend(); drawCompare(); drawMix(); drawSrc(); drawCI(); drawStats();
+}
+
+/* ---------- panel statistics (computed live from the data) ---------- */
+function ols(xs, ys){
+  const n=xs.length, mx=xs.reduce((a,b)=>a+b,0)/n, my=ys.reduce((a,b)=>a+b,0)/n;
+  let sxx=0, sxy=0, syy=0;
+  for(let i=0;i<n;i++){ const dx=xs[i]-mx, dy=ys[i]-my; sxx+=dx*dx; sxy+=dx*dy; syy+=dy*dy; }
+  const slope=sxy/sxx, inter=my-slope*mx;
+  let ssr=0; for(let i=0;i<n;i++){ const e=ys[i]-(slope*xs[i]+inter); ssr+=e*e; }
+  return {slope:slope, r2: syy===0 ? 0 : 1-ssr/syy};
+}
+function pearson(xs, ys){
+  const n=xs.length, mx=xs.reduce((a,b)=>a+b,0)/n, my=ys.reduce((a,b)=>a+b,0)/n;
+  let sxx=0, syy=0, sxy=0;
+  for(let i=0;i<n;i++){ const dx=xs[i]-mx, dy=ys[i]-my; sxx+=dx*dx; syy+=dy*dy; sxy+=dx*dy; }
+  return {r: sxy/Math.sqrt(sxx*syy), slope: sxy/sxx};
+}
+function setStat(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+const TREND_TAKEAWAY_REN = {
+  Germany:"Steady climb, but the historical pace reaches 80% only in 2039.",
+  Denmark:"Fastest climber of the four — 89.2% renewable by 2024.",
+  France:"Gained least of the four (+14.4 pp) — nuclear, not renewables, does the heavy lifting.",
+  Poland:"Started last of the four (1.6%) but overtook France by 2024."};
+const COMPARE_TAKEAWAY = {
+  Denmark:"Too small to rank, but 89.2% renewable — the highest of the four."};
+function drawStats(){
+  const s=S(primary), i=yi(focusYear), i0=yi(2000);
+  // trend: OLS slope + R2 for the selected metric, primary country
+  const o=ols(YEARS, s[metric]);
+  const unit = metric==="ren" ? "pp/yr" : metric==="ci" ? "gCO₂/kWh per yr" : "t per yr";
+  const sign = o.slope>=0 ? "+" : "";
+  let first50 = "";
+  if(metric==="ren"){ const j=s.ren.findIndex(v=>v>50); if(j>=0) first50=` First crossed 50% in ${YEARS[j]}.`; }
+  const tw = metric==="ren" ? TREND_TAKEAWAY_REN[primary]
+           : metric==="ci" ? "Falling carbon intensity tracks the renewable build-out."
+           : "Per-capita emissions fall with the cleaner mix.";
+  setStat("statTrend", `<b>Stat:</b> ${primary}: ${sign}${o.slope.toFixed(2)} ${unit} (OLS, R² = ${o.r2.toFixed(2)}, 2000–2024).${first50} <b>Takeaway:</b> ${tw}`);
+  // compare: rank among the 36 large producers in the focus year
+  const ranks = DATA.panelStats ? DATA.panelStats.compareRank[primary] : null;
+  const rk = ranks ? ranks[focusYear] : null;
+  if(rk){
+    const moved = rk < ranks[2000] ? "Climbed" : rk > ranks[2000] ? "Slipped" : "Unchanged";
+    setStat("statCompare", `<b>Stat:</b> ${primary} ranks #${rk} of 36 large producers (≥ 100 TWh) in ${focusYear}. <b>Takeaway:</b> ${moved} from #${ranks[2000]} in 2000.`);
+  } else {
+    setStat("statCompare", `<b>Stat:</b> ${primary} generates ${Math.round(s.gen[i])} TWh — below the 100 TWh large-producer cut-off, so it holds no rank among the 36. <b>Takeaway:</b> ${COMPARE_TAKEAWAY[primary]}`);
+  }
+  // mix: fossil + nuclear share 2000 vs focus year; largest source 2024
+  // (fossil+nuclear comes from panelStats at full precision — the embedded
+  // shares are rounded to 2 dp and would show 37.3% for Germany 2024)
+  const fnTab = DATA.panelStats ? DATA.panelStats.fossilNuclear[primary] : null;
+  const fn = k => fnTab ? fnTab[YEARS[k]].toFixed(1)
+                         : (s.shares.Coal[k]+s.shares.Gas[k]+s.shares.Nuclear[k]).toFixed(1);
+  const leader = k => Object.keys(SCOLORS).map(n=>[n, s.sources[n][k]]).sort((a,b)=>b[1]-a[1])[0][0];
+  const top24 = Object.keys(SCOLORS).map(n=>[n, s.sources[n][yi(2024)]]).sort((a,b)=>b[1]-a[1])[0];
+  setStat("statMix", `<b>Stat:</b> fossil + nuclear fell from ${fn(i0)}% (2000) to ${fn(i)}% (${focusYear}) of ${primary}'s mix; ${top24[0]} is the largest single source in 2024 (${top24[1].toFixed(1)} TWh). <b>Takeaway:</b> the 2024 leader is ${top24[0]}; in 2000 it was ${leader(i0)}.`);
+  // source breakdown: largest source in the focus year
+  // (share from panelStats at full precision — the embedded shares are rounded)
+  const pairs = Object.keys(SCOLORS).map(n=>[n, s.sources[n][i]]).sort((a,b)=>b[1]-a[1]);
+  const nuc = s.sources.Nuclear[i];
+  const nucNote = pairs[0][0]==="Nuclear" ? "" : `; nuclear is ${nuc.toFixed(1)} TWh`;
+  const shTab = DATA.panelStats ? DATA.panelStats.sourceShares[primary] : null;
+  const sharePct = shTab ? shTab[focusYear][pairs[0][0]].toFixed(1)
+                         : (100*pairs[0][1]/s.gen[i]).toFixed(1);
+  setStat("statSrc", `<b>Stat:</b> ${pairs[0][0]} is the largest single source in ${focusYear}: ${pairs[0][1].toFixed(1)} TWh (${sharePct}% of the mix)${nucNote}. <b>Takeaway:</b> in 2000 the leader was ${leader(i0)}; by 2024 it is ${leader(yi(2024))}.`);
+  // carbon intensity vs renewable share: Pearson r + OLS slope
+  const pc = pearson(s.ren, s.ci);
+  setStat("statCI", `<b>Stat:</b> r = ${pc.r.toFixed(2)} between renewable share and carbon intensity (${primary}, 2000–2024); each extra point of renewables ≈ ${pc.slope.toFixed(1)} gCO₂/kWh less. <b>Takeaway:</b> more renewables, less carbon per kWh.`);
 }
 refresh();
 
