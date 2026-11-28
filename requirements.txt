@@ -3,3 +3,4 @@ numpy
 matplotlib
 tabulate
 statsmodels
+openpyxl  # KPI workbook (outputs/Energy_KPI_Workbook.xlsx)

@@ -12,14 +12,6 @@ Every number below is produced by `src/analysis.py` / `sql/queries.sql` and
 stored in `outputs/results.json` / `outputs/sql_results.md`; nothing is typed
 by hand.
 
-## Citation
-
-If you use this work, please cite the preprint:
-
-Rana, R. (2026). Germany's Renewable Electricity Transition, 2000–2024: A Data Analysis with a Comparison to France, Poland and Denmark. Zenodo. https://doi.org/10.5281/zenodo.24584097
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24584097.svg)](https://doi.org/10.5281/zenodo.24584097)
-
 ## Key findings
 
 1. **Renewables grew nine-fold.** Their share of Germany's electricity rose
@@ -66,10 +58,16 @@ src/download_data.py       downloads the two full OWID source datasets
 src/analysis.py            all headline statistics -> outputs/results.json
 src/analysis_extended.py   multivariate OLS, sub-period trends -> outputs/extended_results.json
 src/build_db.py            builds energy.db (SQLite) and runs the SQL queries
+src/etl_pipeline.py        formal ETL: rebuilds the star-schema CSVs from the OWID sources (validates exactly)
 src/figures.py             figures 1-6 -> outputs/figures/
 src/figures_extra.py       figures 7-8 (crossover, carbon intensity) for the full paper
 sql/queries.sql            9 documented SQL queries (shares, milestones, shocks)
 outputs/sql_results.md     the queries with their actual output tables
+outputs/Energy_KPI_Workbook.xlsx   KPI workbook (KPI cards, yearly series, comparison, panel statistics)
+notebooks/energy_key_numbers.ipynb  reproduces every headline number + panel statistic from the data
+PIPELINE.md                the extract -> transform -> load pipeline, row counts, rounding notes
+dashboard/powerbi/queries.sql       SQL over the star-schema CSVs answering the dashboard questions
+dashboard/powerbi/DATA_DICTIONARY.md  column-level dictionary for the star-schema tables
 paper/paper_full.md        full journal-style manuscript (8 figures, 3 tables)
 paper/paper_draft.md       earlier short draft (superseded by paper_full.md)
 ```
